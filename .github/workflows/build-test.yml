@@ -53,7 +53,7 @@ jobs:
     if: ${{ fromJson(needs.gen-matrix.outputs.matrix) }}
     needs: gen-matrix
     name: build
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     strategy:
       fail-fast: false
@@ -79,16 +79,17 @@ jobs:
           load: true
           context: .
           file: ./${{ steps.short-version.outputs.result }}/Dockerfile
-          tags: rocket.chat:${{ matrix.version }}
+          tags: andywebservices/rocket.chat:${{ matrix.version }}
+          platforms: ${{ matrix.platform }}
 
       - name: Run Image
         env:
-          IMAGE: rocket.chat
+          IMAGE: andywebservices/rocket.chat
           RELEASE: ${{ matrix.version }}
         run: docker compose up -d
 
       - name: Wait for Rocket.Chat to start up
-        uses: cygnetdigital/wait_for_response@v2.0.0
+        uses: andywebservices/wait_for_response@v2.0.1
         with:
           url: 'http://localhost:3000/health'
           responseCode: '200'

@@ -11,7 +11,7 @@ RUN ARCH= && dpkgArch="$(dpkg --print-architecture)" \
   && set -ex \
   && apt-get update && apt-get install -y --no-install-recommends ca-certificates curl unzip && rm -rf /var/lib/apt/lists/* \
   && curl -fsSL https://dl.deno.land/release/v${DENO_VERSION}/deno-${ARCH}-unknown-linux-gnu.zip --output /tmp/deno-${ARCH}-unknown-linux-gnu.zip \
-  && echo "246bf818932c5e11adb85afaaf3c90e65d5cbe14bcaa8ea14d35fc085869775d /tmp/deno-x86_64-unknown-linux-gnu.zip" | sha256sum -c - \
+  && ((echo "246bf818932c5e11adb85afaaf3c90e65d5cbe14bcaa8ea14d35fc085869775d /tmp/deno-x86_64-unknown-linux-gnu.zip" | sha256sum -c -) || (echo "3335cd10a3c17afa5a44fc79484cd3471ca151afa5d9ba6080e55a7faa7dafb5 /tmp/deno-aarch64-unknown-linux-gnu.zip" | sha256sum -c -)) \
   && unzip /tmp/deno-${ARCH}-unknown-linux-gnu.zip -d /tmp \
   && rm /tmp/deno-${ARCH}-unknown-linux-gnu.zip \
   && chmod 755 /tmp/deno \
@@ -53,6 +53,7 @@ RUN set -eux \
   && tar zxf rocket.chat.tgz \
   && rm rocket.chat.tgz rocket.chat.tgz.asc \
   && cd bundle/programs/server \
+  && npm install --cpu=arm64 --os=linux sharp \
   && npm install --unsafe-perm=true \
   && apt-mark auto '.*' > /dev/null \
   && apt-mark manual $aptMark > /dev/null \

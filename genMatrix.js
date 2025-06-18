@@ -59,9 +59,18 @@ const generateBuildMatrix = (filesAdded, filesModified, filesRenamed) => {
 
   const entries = dockerfiles.map(getDockerfileMatrixEntry);
 
+  // Include runner architecture in build matrix
+  const builds = [
+      {platform: 'linux/amd64', runner: 'ubuntu-latest'},
+      {platform: 'linux/arm64', runner: 'ubuntu-24.04-arm'}
+  ];
+  const expandedEntries = entries.flatMap(entry =>
+    builds.map(build => ({ ...entry, ...build }))
+  );
+
   // Return null if there are no entries so we can skip the matrix step
-  return entries.length
-    ? { include: entries }
+  return expandedEntries.length
+    ? { include: expandedEntries }
     : null;
 };
 
